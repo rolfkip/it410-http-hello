@@ -9,7 +9,7 @@ var app = express();
 var apiRouter = express.Router();
 
 var healthRoute = require('./routes/health')(apiRouter);
-var loginRoute = require('./routes/login')(apiRouter);
+//var loginRoute = require('./routes/login')(apiRouter, passport);
 var indexRoute = require('./routes/index')(apiRouter);
 app.use(apiRouter);
 
