@@ -7,9 +7,9 @@ var loginRoute = function(router) {
             })
         });
     router.route('/logout')
-        .get(function(req, res)) {
+        .get(function(req, res) {
             req.logout();
             res.redirect('/');
-        }
+        });
 };
 module.exports = loginRoute;
