@@ -34,7 +34,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/health', function(req, res) {
-    res.sendStatus(200);
+    res.status(200);
+    res.send();
 });
 
 app.post('/login', passport.authenticate('local'), function(req, res) {
@@ -51,7 +52,8 @@ app.post('/login', passport.authenticate('local'), function(req, res) {
 
 app.get('/logout', function(req, res) {
     req.logout();
-    res.sendStatus(200);
+    res.status(200);
+    res.send();
 });
 
 app.get('/', function(req, res) {
@@ -61,23 +63,21 @@ app.get('/', function(req, res) {
 });
 
 app.put('/', function(req, res) {
-    if(!req.user) {
-        res.status(401);
-        res.send();
-    } else {
-        fs.readFile('./keys.json', 'utf8', function(err, data) {
-            if(err) throw err;
-            var keys = JSON.parse(data);
-            var pair = {};
-            pair[req.query.key] = req.query.value;
-            keys[req.user.username].push(pair);
-            var values = keys[req.user.username];
-            fs.writeFile('./keys.json', JSON.stringify(keys), function(err, data) {
-                res.status(200);
-                res.send(values);
-            })
-        });
-    }
+    if(!req.user) return res.sendStatus(401);
+
+    data[req.user.username][req.query.key] = req.query.value;
+    res.status(200);
+    res.send(data[req.user.username]);
 });
 
-app.listen(3000, function() {});
+app.delete('/', function(req, res) {
+    if(!req.user) return res.sendStatus(401);
+
+    delete data[req.user.username][req.query.key];
+    res.status(200);
+    res.send(data[req.user.id]);
+})
+
+app.listen(3000, function() {
+    console.log('Server listening on port 3000.')
+});
