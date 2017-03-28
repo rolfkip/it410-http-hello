@@ -6,14 +6,13 @@ var express             = require('express');
 var LocalStrategy       = require('passport-local').Strategy;
 var passport            = require('passport');
 var session             = require('express-session');
-var fs = require('fs');
 
 var app = express();
 var data = {};
 
 // tell passport to use a local strategy and tell it how to validate a username and password
 passport.use(new LocalStrategy(function(username, password, done) {
-    if (username && password === 'pass') return done(null, { username: username });
+    if (username && password) return done(null, { username: username });
     return done(null, false);
 }));
 
@@ -63,11 +62,11 @@ app.post('/login',
         });*/
         if(!req.user) return res.sendStatus(401);
 
-        if(!data[req.user.id]) {
-            data[req.user.id] = {};
+        if(!data[req.user.username]) {
+            data[req.user.username] = {};
         }
 
-        res.send(data[req.user.id]);
+        res.send(data[req.user.username]);
     }
 );
 
