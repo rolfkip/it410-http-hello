@@ -10,8 +10,8 @@ var session             = require('express-session');
 var app = express();
 
 passport.use(new LocalStrategy(function(username, password, done) {
-    if (username && password === 'pass') return done(null, { username: username });
-    return done(null, false);
+    return done(null, { username: username });
+    //return done(null, false);
 }));
 
 // tell passport how to turn a user into serialized data that will be stored with the session
