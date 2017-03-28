@@ -75,7 +75,7 @@ app.delete('/', function(req, res) {
 
     delete data[req.user.username][req.query.key];
     res.status(200);
-    res.send(data[req.user.id]);
+    res.send(data[req.user.username]);
 })
 
 app.listen(3000, function() {
