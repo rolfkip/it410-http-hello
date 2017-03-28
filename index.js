@@ -9,6 +9,7 @@ var session             = require('express-session');
 var fs = require('fs');
 
 var app = express();
+var data = {};
 
 passport.use(new LocalStrategy(function(username, password, done) {
     return done(null, { username: username });
@@ -35,22 +36,21 @@ app.use(passport.session());
 var apiRouter = express.Router();
 
 app.get('/health', function(req, res) {
-    res.status(200);
-    res.send();
+    res.sendStatus(200);
 });
 
 app.post('/login',
     passport.authenticate('local'),
     function(req, res) {
-        fs.readFile('./keys.json', 'utf8', function(err, data) {
+        /*fs.readFile('./keys.json', 'utf8', function(err, data) {
             if(err) throw err;
             var keys = JSON.parse(data);
             var values = keys[req.user.username];
             if(!values) {
                 var key = req.user.username;
                 var new_user = {};
-                new_user[req.user.username] = [];
-                keys["users"].push(new_user);
+                new_user[req.user.username] = {};
+                keys[req.user.username].push(new_user);
                 fs.writeFile('./keys.json', JSON.stringify(keys), function(err, data) {
                     res.status(200);
                     res.send(values);
@@ -59,18 +59,24 @@ app.post('/login',
             res.status(200);
             res.send(values);
             //var values = keys[req.user];
-        });
+        });*/
+        if(!req.user) return res.sendStatus(401);
+
+        if(!data[req.user.id]) {
+            data[req.user.id] = {};
+        }
+
+        res.send(data[req.user.id]);
     }
 );
 
 app.get('/logout', function(req, res) {
     req.logout();
-    res.status(200);
-    res.send();
+    res.sendStatus(200);
 });
 
 app.get('/', function(req, res) {
-    if(!req.user) {
+    /*if(!req.user) {
         res.status(401);
         res.send();
     } else {
@@ -80,7 +86,10 @@ app.get('/', function(req, res) {
             res.status(200);
             res.send(keys[req.user.username]);
         });
-    }
+    }*/
+    if(!req.user) return res.sendStatus(401);
+
+    res.send(data[req.user.username]);
 });
 
 app.put('/', function(req, res) {
