@@ -11,9 +11,10 @@ var fs = require('fs');
 var app = express();
 var data = {};
 
+// tell passport to use a local strategy and tell it how to validate a username and password
 passport.use(new LocalStrategy(function(username, password, done) {
-    return done(null, { username: username });
-    //return done(null, false);
+    if (username && password === 'pass') return done(null, { username: username });
+    return done(null, false);
 }));
 
 // tell passport how to turn a user into serialized data that will be stored with the session
