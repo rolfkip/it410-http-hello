@@ -6,6 +6,7 @@ var express             = require('express');
 var LocalStrategy       = require('passport-local').Strategy;
 var passport            = require('passport');
 var session             = require('express-session');
+var fs = require('fs');
 
 var app = express();
 
@@ -41,8 +42,24 @@ app.get('/health', function(req, res) {
 app.post('/login',
     passport.authenticate('local'),
     function(req, res) {
-        res.status(200);
-        res.send();
+        fs.readFile('./keys.json', 'utf8', function(err, data) {
+            if(err) throw err;
+            var keys = JSON.parse(data);
+            var values = keys[req.user.username];
+            if(!values) {
+                var key = req.user.username;
+                var new_user = {};
+                new_user[req.user.username] = [];
+                keys["users"].push(new_user);
+                fs.writeFile('./keys.json', JSON.stringify(keys), function(err, data) {
+                    res.status(200);
+                    res.send(values);
+                });
+            }
+            res.status(200);
+            res.send(values);
+            //var values = keys[req.user];
+        });
     }
 );
 
@@ -50,6 +67,40 @@ app.get('/logout', function(req, res) {
     req.logout();
     res.status(200);
     res.send();
+});
+
+app.get('/', function(req, res) {
+    if(!req.user) {
+        res.status(401);
+        res.send();
+    } else {
+        fs.readFile('./keys.json', 'utf8', function(err, data) {
+            if(err) throw err;
+            var keys = JSON.parse(data);
+            res.status(200);
+            res.send(keys[req.user.username]);
+        });
+    }
+});
+
+app.put('/', function(req, res) {
+    if(!req.user) {
+        res.status(401);
+        res.send();
+    } else {
+        fs.readFile('./keys.json', 'utf8', function(err, data) {
+            if(err) throw err;
+            var keys = JSON.parse(data);
+            var pair = {};
+            pair[req.query.key] = req.query.value;
+            keys[req.user.username].push(pair);
+            var values = keys[req.user.username];
+            fs.writeFile('./keys.json', JSON.stringify(keys), function(err, data) {
+                res.status(200);
+                res.send(values);
+            })
+        });
+    }
 });
 
 app.listen(3000, function() {});
